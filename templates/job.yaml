@@ -1,0 +1,44 @@
+{{- if .Values.schema.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "roboshop.fullname" . }}
+  labels:
+    {{- include "roboshop.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
+      volumes:
+        - name: parameter-store
+          emptyDir:
+            sizeLimit: 5Mi
+      initContainers:
+        - name: parameters-pull
+          image: 136325909517.dkr.ecr.us-east-1.amazonaws.com/parameters-pull
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /parameter-store
+              name: parameter-store
+          env:
+            - name: ENV
+              value: {{ .Values.ENV }}
+            - name: COMPONENT
+              value: {{ .Values.COMPONENT }}
+      containers:
+        - name: schema
+          image: 136325909517.dkr.ecr.us-east-1.amazonaws.com/schema
+          imagePullPolicy: Always
+          env:
+            - name: SCHEMA_TYPE
+              value: {{ .Values.schema.schema_type }}
+            - name: COMPONENT
+              value: {{ .Values.COMPONENT }}
+          volumeMounts:
+            - mountPath: /parameter-store
+              name: parameter-store
+      restartPolicy: Never
+  backoffLimit: 1
+  {{- end }}
