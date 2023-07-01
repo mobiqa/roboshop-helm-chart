@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "roboshop.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
+  {- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
@@ -13,47 +13,26 @@ spec:
       {{- include "roboshop.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "roboshop.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.initContainer.enabled }}
-      initContainers:
-        - name: parameters-pull
-          image: 136325909517.dkr.ecr.us-east-1.amazonaws.com/parameters-pull
-          imagePullPolicy: Always
-          volumeMounts:
-            - mountPath: /parameter-store
-              name: parameter-store
-          env:
-            - name: ENV
-              value: "{{ .Values.ENV }}"
-            - name: COMPONENT
-              value: "{{ .Values.COMPONENT }}"
-      {{- end }}
-      volumes:
-        - name: parameter-store
-          emptyDir:
-            sizeLimit: 5Mi
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          volumeMounts:
-            - mountPath: /parameter-store
-              name: parameter-store
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
