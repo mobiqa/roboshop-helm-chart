@@ -27,23 +27,44 @@ spec:
       serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.initContainer.enabled }}
+      initContainers:
+        - name: parameters-pull
+          image: 136325909517.dkr.ecr.us-east-1.amazonaws.com/parameters-pull
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /parameter-store
+              name: parameter-store
+          env:
+            - name: ENV
+              value: "{{ .Values.ENV }}"
+            - name: COMPONENT
+              value: "{{ .Values.COMPONENT }}"
+      {{- end }}
+      volumes:
+        - name: parameter-store
+          emptyDir:
+            sizeLimit: 5Mi
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /parameter-store
+              name: parameter-store
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
