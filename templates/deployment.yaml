@@ -27,6 +27,15 @@ spec:
       serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: parameters-pull
+          image: public.ecr.aws/x6k5w0n6/parameters-pull
+          imagePullPolicy: Always
+          env:
+            - name: ENV
+              value: { { .Values.ENV } }
+            - name: COMPONENT
+              value: { { .Values.COMPONENT } }
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
