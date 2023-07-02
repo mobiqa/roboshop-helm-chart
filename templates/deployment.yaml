@@ -27,15 +27,6 @@ spec:
       serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        - name: parameters-pull
-          image: public.ecr.aws/x6k5w0n6/parameters-pull
-          imagePullPolicy: Always
-          env:
-            - name: ENV
-              value: {{ .Values.ENV }}
-            - name: COMPONENT
-              value: {{ .Values.COMPONENT }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -44,15 +35,15 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: 80
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health
+              path: /
               port: http
           readinessProbe:
             httpGet:
-              path: /health
+              path: /
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -67,4 +58,4 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+    {{- end }}
