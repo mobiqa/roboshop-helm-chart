@@ -39,6 +39,10 @@ spec:
               value: {{ .Values.ENV }}
             - name: COMPONENT
               value: {{ .Values.COMPONENT }}
+      volumes:
+        - name: parameter-store
+          emptyDir:
+            sizeLimit: 5Mi
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
