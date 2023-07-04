@@ -5,12 +5,12 @@ metadata:
   name: {{ include "roboshop.fullname" . }}
   labels:
     {{- include "roboshop.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": pre-install
+#  annotations:
+#    "helm.sh/hook": pre-install
 spec:
   template:
     spec:
-      serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
+#      serviceAccountName: {{ include "roboshop.serviceAccountName" . }}
       volumes:
         - name: parameter-store
           emptyDir:
