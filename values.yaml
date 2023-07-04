@@ -18,9 +18,7 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::136325909517:role/parameter-store-role-with-oidc
-    "helm.sh/hook": pre-install
+  annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
