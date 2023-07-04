@@ -46,7 +46,7 @@ spec:
           emptyDir:
             sizeLimit: 5Mi
       containers:
-        - name: {{ .Chart.Name }}
+        - name: "{{ .Values.COMPONENT }}"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
