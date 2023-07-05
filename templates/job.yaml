@@ -5,9 +5,7 @@ metadata:
   name: {{ include "roboshop.fullname" . }}
   labels:
     {{- include "roboshop.labels" . | nindent 4 }}
-  annotations:
-    "helm.sh/hook": pre-install
-spec:
+  spec:
   template:
     spec:
       volumes:
